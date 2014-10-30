@@ -4,8 +4,6 @@ import ipdb
 import cv
 import cv2
 
-from dataset import *
-
 colors = [cv.CV_RGB(255,0,0), cv.CV_RGB(0,0,255), cv.CV_RGB(255,255,0), 
           cv.CV_RGB(128,128,128)]
 
