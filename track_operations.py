@@ -6,10 +6,14 @@ class Track:
     '''
     Parameters
     ----------
-    obj_id:  unique id for an object track
-    obj_type: category for the track - person, car etc.
-    track_format: 'wd_ht' or 'two_points'
-    
+    obj_id:          unique id for an object track
+    obj_type:        category for the track - person, car etc.
+    track_format:    'wd_ht' or 'two_points'
+    operator:        a function that takes in a frame and bbox and returns a 
+                     modified frame
+                     Ex: blur(frame_img,frame_index, [bbox_x1, bbox_y1, bbox_x2, bbox_y2])
+
+
     track is a dictionary - {frame: [bbox_x, bbox_y, bbox_wd, bbox_ht], ...}
     attribute is also a dictionary - {frame: 'text', ...}
     '''
@@ -17,6 +21,7 @@ class Track:
     self.obj_type = obj_type
     self.track = {}
     self.attributes = {}
+    self.operator = None
     if track_format is not 'wd_ht' and track_format is not 'two_points':
       raise ValueError()
     else: 

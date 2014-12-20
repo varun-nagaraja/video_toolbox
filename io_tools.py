@@ -25,6 +25,10 @@ def cap_number(num,low,high):
 def annotate_frames(input_video_file, output_video_file, tracks):
   '''
   Draws bounding boxes of the tracks along with some text if it exists.
+  
+  Parameters
+  ----------
+  tracks            Array of Track objects
   '''
   max_frame_over_all = 0
   for i in tracks:
@@ -60,24 +64,27 @@ def annotate_frames(input_video_file, output_video_file, tracks):
       tracks_in_curr_frame = track_ids_per_frame[frame_num]
       for track in tracks_in_curr_frame:
         bbox = tracks[track].track[frame_num]
-        bbox_x1 = int(cap_number(bbox[0],0,wd))
-        bbox_y1 = int(cap_number(bbox[1],0,ht))
+        bbox_x1 = int(cap_number(bbox[0],0,wd-1))
+        bbox_y1 = int(cap_number(bbox[1],0,ht-1))
         if tracks[track].track_format == 'wd_ht':
-          bbox_x2 = int(cap_number(bbox[0]+bbox[2],0,wd))
-          bbox_y2 = int(cap_number(bbox[1]+bbox[3],0,ht))
+          bbox_x2 = int(cap_number(bbox[0]+bbox[2],0,wd-1))
+          bbox_y2 = int(cap_number(bbox[1]+bbox[3],0,ht-1))
         elif tracks[track].track_format == 'two_points':
-          bbox_x2 = int(cap_number(bbox[2],0,wd))
-          bbox_y2 = int(cap_number(bbox[3],0,ht))
+          bbox_x2 = int(cap_number(bbox[2],0,wd-1))
+          bbox_y2 = int(cap_number(bbox[3],0,ht-1))
         obj_id = tracks[track].obj_id
         
         box_color = colors[int(obj_id) % len(colors)] 
         cv2.rectangle(frame_img,(bbox_x1,bbox_y1),(bbox_x2,bbox_y2),box_color,10)
         if frame_num in tracks[track].attributes:
-          attribute_text = tracks[track].attributes[frame_num]
+          attribute_text = str(tracks[track].obj_id) + "," + tracks[track].attributes[frame_num]
           if len(attribute_text) > 0: 
             cv2.putText(frame_img,attribute_text,(bbox_x1, bbox_y1-5),
                         cv2.FONT_HERSHEY_SIMPLEX,1,box_color,3)
     
+        if tracks[track].operator is not None:
+          frame_img = tracks[track].operator(frame_img, frame_num, [bbox_x1, bbox_y1, bbox_x2, bbox_y2])  
+        
     video_output.write(frame_img)
     ret, frame_img = video_input.read()
     
@@ -94,4 +101,3 @@ def split_video(in_filename, start_time, end_time, out_filename):
             ' -to '+str(end_time)+ ' -async 1 ' + out_filename)
   
 
-     
