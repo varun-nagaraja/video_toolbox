@@ -55,7 +55,7 @@ def annotate_frames(input_video_file, output_video_file, tracks):
   fourcc_code = int(video_input.get(cv.CV_CAP_PROP_FOURCC))
   wd = int(video_input.get(cv.CV_CAP_PROP_FRAME_WIDTH))
   ht = int(video_input.get(cv.CV_CAP_PROP_FRAME_HEIGHT))
-  fourcc = cv.CV_FOURCC('H','2','6','4')
+  fourcc = cv.CV_FOURCC('X','V','I','D')
   
   video_output = cv2.VideoWriter(output_video_file,fourcc,fps,(wd,ht))
   if not video_output.isOpened():
