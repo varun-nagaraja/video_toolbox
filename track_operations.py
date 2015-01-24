@@ -47,6 +47,14 @@ class Track:
     track = {frame: [bbox_x, bbox_y, bbox_wd, bbox_ht], ...}
     '''
     self.track[int(frame)] = bbox
+
+  def append_track_to_track(self,another_track):
+    '''
+    Combines another track with the current track
+    
+    track = {frame: [bbox_x, bbox_y, bbox_wd, bbox_ht], ...}
+    '''
+    self.track.update(another_track)
     
     
   def append_to_attributes(self,attribute):
@@ -60,7 +68,16 @@ class Track:
         self.attributes[frame] += "," + attribute[frame]
       else:
         self.attributes[frame] = attribute[frame]
+
+  
+  def append_attribute_to_all_frames(self,attr):
+    '''
+
+    '''
+    for frame in self.track:
+      self.attributes[frame] = attr
         
+  
   def get_tracklets(self):
     '''
     Returns list of tracklets in the track.
@@ -93,7 +110,7 @@ def get_tracklets(trackish):
   return tracklets
 
 
-def clip_track(track, start_frame, end_frame):
+def clip_track(track, start_frame, end_frame, restart_numbering=True):
   '''
   Returns a new track object with a track between start_frame and end_frame.
   The frame number starts from 1 and ends at (end_frame - start_frame + 1)
@@ -101,7 +118,10 @@ def clip_track(track, start_frame, end_frame):
   clipped_track = Track(track.obj_id, track.obj_type, track.track_format)
   for frame in track.track:
     if frame >= start_frame and frame <= end_frame :
-      clipped_track.append_to_track(frame-start_frame+1, track.track[frame])
+      if restart_numbering:
+        clipped_track.append_to_track(frame-start_frame+1, track.track[frame])
+      else:
+        clipped_track.append_to_track(frame, track.track[frame])
   
   return clipped_track
 
