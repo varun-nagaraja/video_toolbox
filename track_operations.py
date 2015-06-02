@@ -20,6 +20,7 @@ class Track:
     attribute is also a dictionary - {frame: 'text', ...}
     '''
     self.obj_id = obj_id
+    self.parent_obj_id = obj_id
     self.obj_type = obj_type
     self.track = {}
     self.attributes = {}
@@ -40,6 +41,12 @@ class Track:
   def operator(self):
     return self._operator
     
+  def get_min_frame(self):
+      return(min(self.track.keys()))
+  
+  def get_max_frame(self):
+      return(max(self.track.keys()))
+  
   def append_to_track(self,frame,bbox):
     '''
     Appends frame by frame to an existing track.
@@ -108,6 +115,26 @@ def get_tracklets(trackish):
   tracklets = [(frame_nums[frame_jumps[i]+1], frame_nums[frame_jumps[i+1]]) 
                for i in range(len(frame_jumps)-1)]
   return tracklets
+
+
+def get_tracks_with_breaks(tracks):
+  '''
+  Creates new tracks from tracklets
+  '''
+  broken_tracks = {}
+  obj_id = 0
+  for i in tracks:
+    t = tracks[i]
+    tracklets = t.get_tracklets()
+    for (s,e) in tracklets:
+      new_t = Track(obj_id,t.obj_type,t.track_format,t.operator)
+      new_t.parent_obj_id = t.obj_id
+      sub_track = dict((f,t.track[f]) for f in range(s,e+1))
+      new_t.append_track_to_track(sub_track)
+      broken_tracks[obj_id] = new_t
+      obj_id += 1
+
+  return broken_tracks
 
 
 def clip_track(track, start_frame, end_frame, restart_numbering=True):
